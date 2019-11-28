@@ -5,6 +5,8 @@ Given a point *x* and a perturbation *P*, silva symbolically computes an overapp
 
 When silva returns more labels, it may happen due to the classifier really being not stable, or because of a loss of precision induced by the abstract process. For forests consisting of univariate hard splits only (i.e. *x_i < k*) and *l_\inf* perturbation silva becomes *complete*: every single label in the output set is guaranteed to be associated to at least one point in *P(x)*, thus no false results can be returned.
 
+More information can be found in [Abstract interpretation of decision tree ensemble classifiers](http://www.math.unipd.it/~ranzato/papers/aaai20.pdf).
+
 ## Requirements ##
 
  - Any C99-compatible C compiler
