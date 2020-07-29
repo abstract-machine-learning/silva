@@ -13,6 +13,7 @@
 #include "../abstract_domains/abstract_domain.h"
 #include "../adversarial_region.h"
 #include "stability_status.h"
+#include "../tier.h"
 
 
 /** Type of an abstract classifier. */
@@ -31,7 +32,8 @@ typedef struct abstract_classifier *AbstractClassifier;
 void abstract_classifier_create(
     AbstractClassifier *AC,
     const Classifier C,
-    const AbstractDomain A
+    const AbstractDomain A,
+    Tier *t
 );
 
 

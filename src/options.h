@@ -13,6 +13,7 @@
 
 #include "forest.h"
 #include "perturbation.h"
+#include "tier.h"
 #include "abstract_domains/abstract_domain.h"
 
 
@@ -29,6 +30,7 @@ struct options {
     ForestVotingScheme voting_scheme;  /**< Forest voting scheme. */
     AbstractDomain abstract_domain;    /**< Abstract domain to use for analysis. */
     Perturbation perturbation;         /**< Type of perturbation. */
+    Tier tier;                         /**< Tier list of features. */
     unsigned int sample_timeout;       /**< Maximum allowed execution time for
                                             one sample analysis (seconds). */
     unsigned int seed;                 /**< Seed to use for random number
@@ -36,6 +38,8 @@ struct options {
 };
 
 
+
+void options_delete(Options *options);
 
 /**
  * Reads command-line options.

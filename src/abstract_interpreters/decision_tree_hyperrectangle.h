@@ -9,6 +9,7 @@
 
 #include "../decision_tree.h"
 #include "../abstract_domains/hyperrectangle.h"
+#include "../tier.h"
 #include "stability_status.h"
 
 
@@ -24,7 +25,8 @@
 void decision_tree_hyperrectangle_is_stable(
     StabilityStatus *status,
     const DecisionTree T,
-    const Hyperrectangle x
+    const Hyperrectangle x,
+    const Tier t
 );
 
 #endif

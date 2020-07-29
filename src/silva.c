@@ -117,7 +117,7 @@ int main(const int argc, const char **argv) {
 
 
     /* Creates abstract classifier */
-    abstract_classifier_create(&abstract_classifier, classifier, options.abstract_domain);
+    abstract_classifier_create(&abstract_classifier, classifier, options.abstract_domain, &options.tier);
 
 
     /* Prepares auxiliary data structures */
@@ -226,6 +226,7 @@ int main(const int argc, const char **argv) {
     set_delete(&concrete_labels);
     set_delete(&abstract_labels);
     free(status.sample_b);
+    options_delete(&options);
     stopwatch_delete(&stopwatch);
 
     return EXIT_SUCCESS;

@@ -15,6 +15,7 @@
 struct abstract_classifier {
     Classifier C;      /**< Concrete classifier. */
     AbstractDomain A;  /**< Abstract domain. */
+    Tier t;            /**< Features tier list. */
 };
 
 
@@ -22,16 +23,19 @@ struct abstract_classifier {
 void abstract_classifier_create(
     AbstractClassifier *AC,
     const Classifier C,
-    const AbstractDomain A
+    const AbstractDomain A,
+    Tier *t
 ) {
     AbstractClassifier ac = (AbstractClassifier) malloc(sizeof(struct abstract_classifier));
     if (ac == NULL) {
         fprintf(stderr, "[%s: %d] Cannot allocate memory.\n", __FILE__, __LINE__);
         abort();
     }
+    tier_resize(t, classifier_get_feature_space_size(C));
 
     ac->C = C;
     ac->A = A;
+    ac->t = *t;
     *AC = ac;
 }
 
@@ -62,7 +66,7 @@ void abstract_classifier_is_stable(
         abort();
 
     case DOMAIN_HYPERRECTANGLE:
-        classifier_hyperrectangle_is_stable(result, C, x);
+        classifier_hyperrectangle_is_stable(result, C, x, AC->t);
         break;
     }
 }

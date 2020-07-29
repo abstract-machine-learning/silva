@@ -40,12 +40,12 @@ $(NAME): bitmask.o list.o stack.o set.o binary_heap.o priority_queue.o \
 	data_mappers/decision_tree_graphviz.o \
 	data_mappers/forest_silva.o \
 	data_mappers/classifier_silva.o \
-	perturbation.o \
+	tier.o perturbation.o \
 	abstract_interpreters/abstract_classifier.o \
 	abstract_interpreters/classifier_hyperrectangle.o \
 	abstract_interpreters/decision_tree_hyperrectangle.o \
 	abstract_interpreters/forest_hyperrectangle.o \
-	options.o \
+	option.o configuration.o options.o \
 	silva.o
 
 install: $(NAME)

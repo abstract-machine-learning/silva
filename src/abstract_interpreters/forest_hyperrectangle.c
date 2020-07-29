@@ -52,7 +52,8 @@ struct analysis_data {
     DecisionTreeNode *S;             /**< Stack of nodes. */
     DecisionTreeNode *L;             /**< List of nodes. */
     unsigned int *local_scores;      /**< Array of integer scores. */
-    Set local_labels;                /**< #Set of labels for local use. */
+    Set local_labels;                /**< Set of labels for local use. */
+    Tier tier;                       /**< Feature tiers. */
 };
 
 
@@ -668,6 +669,48 @@ static void decorator_compute_labels(
  * Internal functions and data structures.
  **********************************************************************/
 
+static void adjust_tier(Hyperrectangle x, const Tier tier, const unsigned int i, const unsigned is_active) {
+    const unsigned int group = tier.tiers[i];
+
+    // Feature is not part of a tier
+    if (group == 0) {
+        return;
+    }
+
+    // If feature was activated, every feature in the same tier must be turned off
+    if (is_active) {
+        unsigned int j;
+        x->intervals[i].l = 1.0;
+        x->intervals[i].u = 1.0;
+        for (j = 0; j < tier.size; ++j) {
+            if (j != i && tier.tiers[j] == group) {
+                x->intervals[j].l = 0.0;
+                x->intervals[j].u = 0.0;
+            }
+        }
+    }
+
+    // If feature was turned of, and every other feature but one in the
+    // same tier is off, then the remaining feature must be turned on
+    else {
+        unsigned int j, n_members = 0, n_off = 0, candidate = 0;
+        x->intervals[i].l = 0.0;
+        x->intervals[i].u = 0.0;
+        for (j = 0; j < tier.size; ++j) {
+            if (tier.tiers[j] == group) {
+                const unsigned int is_off = x->intervals[j].l == 0.0 && x->intervals[j].u == 0.0;
+                ++n_members;
+                n_off += is_off;
+                candidate = j * (1 - is_off);
+            }
+            if (n_members == n_off + 1) {
+                x->intervals[candidate].l = 1.0;
+                x->intervals[candidate].u = 1.0;
+            }
+        }
+    }
+}
+
 /**
  * Tells whether an analysis is complete.
  *
@@ -804,11 +847,13 @@ static void refine(List refined, const Node n, Context context) {
             hyperrectangle_copy(x_right, x_prime);
 
             x_left->intervals[i].u = min(x_left->intervals[i].u, k);
+            adjust_tier(x_left, data->tier, i, 0);
             priority = depth + (k - x_prime->intervals[i].l) / interval_radius(x_prime->intervals[i]);
             priority_queue_push(Qx, x_left, priority);
             priority_queue_push(Qt, decision_tree_univariate_linear_split_get_left_child(N), priority);
 
             x_right->intervals[i].l = max(x_left->intervals[i].u, k + EPSILON);
+            adjust_tier(x_right, data->tier, i, 1);
             priority = depth + (x_prime->intervals[i].u - k) / interval_radius(x_prime->intervals[i]);
             priority_queue_push(Qx, x_right, priority);
             priority_queue_push(Qt, decision_tree_univariate_linear_split_get_right_child(N), priority);
@@ -816,6 +861,7 @@ static void refine(List refined, const Node n, Context context) {
 
         /* Hyperrectangle belongs to left hyperspace */
         else if (x_prime->intervals[i].u <= k) {
+            adjust_tier(x_prime, data->tier, i, 0);
             double priority = depth + (k - x_prime->intervals[i].l) / interval_radius(x_prime->intervals[i]);
             priority_queue_push(Qx, x_prime, priority);
             priority_queue_push(Qt, decision_tree_univariate_linear_split_get_left_child(N), priority);
@@ -823,6 +869,7 @@ static void refine(List refined, const Node n, Context context) {
 
         /* Hyperrectangle belongs to right hyperspace */
         else if (x_prime->intervals[i].l > k) {
+            adjust_tier(x_prime, data->tier, i, 1);
             double priority = depth + (x_prime->intervals[i].u - k) / interval_radius(x_prime->intervals[i]);
             priority_queue_push(Qx, x_prime, priority);
             priority_queue_push(Qt, decision_tree_univariate_linear_split_get_right_child(N), priority);
@@ -883,7 +930,8 @@ static double compute_priority(const Node x, Context context) {
 void forest_hyperrectangle_is_stable(
     StabilityStatus *status,
     const Forest F,
-    const Hyperrectangle x
+    const Hyperrectangle x,
+    const Tier t
 ) {
     Hyperrectangle x_prime;
     HyperrectangleDecorator start, goal;
@@ -913,6 +961,7 @@ void forest_hyperrectangle_is_stable(
     data.L = malloc(CONTAINER_SIZE * sizeof(DecisionTreeNode));
     data.local_scores = (unsigned int *) malloc(forest_get_n_labels(F) * sizeof(unsigned int));
     set_create(&data.local_labels, set_equality_string);
+    data.tier = t;
 
 
     /* Runs analysis */

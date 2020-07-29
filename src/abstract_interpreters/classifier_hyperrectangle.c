@@ -90,7 +90,8 @@ static void adversarial_region_to_hyperrectangle(
 void classifier_hyperrectangle_is_stable(
     StabilityStatus *result,
     const Classifier C,
-    const AdversarialRegion x
+    const AdversarialRegion x,
+    const Tier t
 ) {
     Hyperrectangle h;
 
@@ -102,7 +103,8 @@ void classifier_hyperrectangle_is_stable(
         decision_tree_hyperrectangle_is_stable(
             result,
             classifier_get_decision_tree(C),
-            h
+            h,
+            t
         );
         break;
 
@@ -110,7 +112,8 @@ void classifier_hyperrectangle_is_stable(
         forest_hyperrectangle_is_stable(
             result,
             classifier_get_forest(C),
-            h
+            h,
+            t
         );
         break;
     }

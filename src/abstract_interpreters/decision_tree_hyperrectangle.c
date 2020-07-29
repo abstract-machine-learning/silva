@@ -228,7 +228,8 @@ static void search_counterexample(
 void decision_tree_hyperrectangle_is_stable(
     StabilityStatus *status,
     const DecisionTree T,
-    const Hyperrectangle x
+    const Hyperrectangle x,
+    const Tier t
 ) {
     const unsigned int has_sample = status->has_sample;
 

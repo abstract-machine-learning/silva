@@ -132,9 +132,30 @@ static void read_perturbation(
 }
 
 
+static void read_tiers(
+    Options *options,
+    const int argc,
+    const char *argv[],
+    int *i
+) {
+    unsigned int j, size;
+    (void) argc;
+    sscanf(argv[*i], "%u", &size);
+    tier_create(&options->tier, size);
+    for (j = 0; j < size; ++j) {
+        sscanf(argv[*i + 1 + j], "%u", options->tier.tiers + j);
+    }
+    *i += 1 + size;
+}
+
+
 /***********************************************************************
  * Public functions.
  **********************************************************************/
+
+void options_delete(Options *options) {
+    tier_delete(&options->tier);
+}
 
 void options_read(Options *options, const int argc, const char *argv[]) {
     int i;
@@ -145,6 +166,7 @@ void options_read(Options *options, const int argc, const char *argv[]) {
     options->voting_scheme = VOTING_SCHEME;
     options->perturbation.type = PERTURBATION_L_INF;
     options->perturbation.data.l_inf.magnitude = 0.0;
+    options->tier.size = 0;
     options->sample_timeout = SAMPLE_TIMEOUT;
     options->abstract_domain.type = DOMAIN_HYPERRECTANGLE;
     options->seed = SEED;
@@ -168,6 +190,10 @@ void options_read(Options *options, const int argc, const char *argv[]) {
         else if (strcmp(argv[i], "--perturbation") == 0 && i + 1 < argc) {
             ++i;
             read_perturbation(options, argc, argv, &i);
+        }
+        else if (strcmp(argv[i], "--tiers") == 0 && i + 1 < argc) {
+            ++i;
+            read_tiers(options, argc, argv, &i);
         }
         else if (strcmp(argv[i], "--sample-timeout") == 0 && i + 1 < argc) {
             ++i;
@@ -201,6 +227,7 @@ void display_help(const int argc, const char *argv[]) {
     printf("\t%-32s Voting scheme to use for forests (default: max)\n", "--voting {max | average | softargmax}");
     printf("\t%-32s Abstract domain to use (default: hyperrectangle)\n", "--abstraction {interval | hyperrectangle}");
     printf("\t%-32s Perturbation to analyse, followed by perturbation-specific options (default: l_inf 0)\n", "--perturbation {l_inf} [DATA]");
+    printf("\t%-32s Tier list of features\n", "--tiers N VALUE...");
     printf("\t%-32s Maximum allowed execution time for each sample analysis, in seconds (default: %u)\n", "--sample-timeout VALUE", SAMPLE_TIMEOUT);
     printf("\t%-32s Seed to use for random number generation, reserved for future use (default: %u)\n", "--seed VALUE", SEED);
     printf("\n");
@@ -225,6 +252,13 @@ void options_print(const Options options, FILE *stream) {
     fprintf(stream, "\tperturbation: ");
     perturbation_print(options.perturbation, stream);
     fprintf(stream, "\n");
+    fprintf(stream, "\ttiers:\n");
+    if (options.tier.size > 0) {
+        tier_print(options.tier, stream);
+    }
+    else {
+        fprintf(stream, "none\n");
+    }
     fprintf(stream, "\tsample timeout: %u\n", options.sample_timeout);
     fprintf(stream, "\tabstraction: ");
     abstract_domain_print(options.abstract_domain, stream);

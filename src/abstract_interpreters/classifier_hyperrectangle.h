@@ -11,6 +11,7 @@
 #include "../abstract_domains/hyperrectangle.h"
 #include "../adversarial_region.h"
 #include "stability_status.h"
+#include "../tier.h"
 
 
 /**
@@ -25,7 +26,8 @@
 void classifier_hyperrectangle_is_stable(
     StabilityStatus *result,
     const Classifier C,
-    const AdversarialRegion x
+    const AdversarialRegion x,
+    const Tier t
 );
 
 #endif
