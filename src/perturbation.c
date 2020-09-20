@@ -46,6 +46,21 @@ static void perturbation_print_l_inf_clip_all(
 
 
 
+/**
+ * Prints a perturbation read from file
+ *
+ * @param[in] perturbation Perturbation
+ * @param[out] stream Stream
+ */
+static void perturbation_print_from_file(
+    const Perturbation perturbation,
+    FILE *stream
+) {
+    fprintf(stream, "Perturbation read from file: %p", (void *) perturbation.data.from_file.stream);
+}
+
+
+
 /***********************************************************************
  * Public functions.
  **********************************************************************/
@@ -58,6 +73,10 @@ void perturbation_print(const Perturbation perturbation, FILE *stream) {
 
         case PERTURBATION_L_INF_CLIP_ALL:
             perturbation_print_l_inf_clip_all(perturbation, stream);
+            break;
+
+        case PERTURBATION_FROM_FILE:
+            perturbation_print_from_file(perturbation, stream);
             break;
     }
 }

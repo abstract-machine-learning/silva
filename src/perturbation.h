@@ -11,8 +11,9 @@
 
 /** Types of perturbation. */
 typedef enum {
-    PERTURBATION_L_INF,          /**< \f$L_\infty\f$ perturbation. */
-    PERTURBATION_L_INF_CLIP_ALL  /**< As \f$L_\infty\f$, but every dimension is bound. */
+    PERTURBATION_L_INF,           /**< \f$L_\infty\f$ perturbation. */
+    PERTURBATION_L_INF_CLIP_ALL,  /**< As \f$L_\infty\f$, but every dimension is bound. */
+    PERTURBATION_FROM_FILE        /**< Reads hyperrectangle adversarial regions from file. */
 } PerturbationType;
 
 
@@ -30,10 +31,17 @@ struct l_inf_clip_all_data {
 };
 
 
+/** Structure of a perturbation from file. */
+struct from_file_data {
+    FILE *stream;  /**< Pointer to stream. */
+};
+
+
 /** Union of perturbation data. */
 union perturbation_data {
-    struct l_inf_data l_inf;  /**< Data of l_inf perturbation. */
+    struct l_inf_data l_inf;                    /**< Data of l_inf perturbation. */
     struct l_inf_clip_all_data l_inf_clip_all;  /**< Data of clipped l_inf perturbation. */
+    struct from_file_data from_file;            /**< Data of file perturbation. */
 };
 
 

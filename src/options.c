@@ -125,6 +125,17 @@ static void read_perturbation(
         *i += 3;
     }
 
+    else if (strcmp(argv[*i], "from-file") == 0 && *i + 1 < argc) {
+        FILE *stream = fopen(argv[*i + 1], "r");
+        options->perturbation.type = PERTURBATION_FROM_FILE;
+        if (stream == NULL) {
+            fprintf(stderr, "[%s: %d] Cannot read perturbation file.\n", __FILE__, __LINE__);
+            abort();
+        }
+        options->perturbation.data.from_file.stream = stream;
+        ++*i;
+    }
+
     else {
         fprintf(stderr, "[%s: %d] Unsupported perturbation.\n", __FILE__, __LINE__);
         abort();
@@ -155,6 +166,9 @@ static void read_tiers(
 
 void options_delete(Options *options) {
     tier_delete(&options->tier);
+    if (options->perturbation.type == PERTURBATION_FROM_FILE) {
+        fclose(options->perturbation.data.from_file.stream);
+    }
 }
 
 void options_read(Options *options, const int argc, const char *argv[]) {
@@ -226,7 +240,7 @@ void display_help(const int argc, const char *argv[]) {
     printf("\t%-32s Maximum number of characters to print for long strings, -1 to disable limit (deafult: %u)\n", "--max-print-length VALUE", MAX_PRINT_LENGTH);
     printf("\t%-32s Voting scheme to use for forests (default: max)\n", "--voting {max | average | softargmax}");
     printf("\t%-32s Abstract domain to use (default: hyperrectangle)\n", "--abstraction {interval | hyperrectangle}");
-    printf("\t%-32s Perturbation to analyse, followed by perturbation-specific options (default: l_inf 0)\n", "--perturbation {l_inf} [DATA]");
+    printf("\t%-32s Perturbation to analyse, followed by perturbation-specific options (default: l_inf 0)\n", "--perturbation {l_inf, from-file} [DATA]");
     printf("\t%-32s Tier list of features\n", "--tiers N VALUE...");
     printf("\t%-32s Maximum allowed execution time for each sample analysis, in seconds (default: %u)\n", "--sample-timeout VALUE", SAMPLE_TIMEOUT);
     printf("\t%-32s Seed to use for random number generation, reserved for future use (default: %u)\n", "--seed VALUE", SEED);
@@ -235,6 +249,8 @@ void display_help(const int argc, const char *argv[]) {
     printf("Perturbation-specific options:\n");
     printf("\tl_inf\n");
     printf("\t\tmagnitude\tRadius of the L_inf ball giving the perturbation region\n");
+    printf("\tfrom_file\n");
+    printf("\t\tfile_name\tPath to perturbation file\n");
     printf("\n");
 
     printf("Examples:\n");

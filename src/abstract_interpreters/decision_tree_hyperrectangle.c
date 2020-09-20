@@ -232,6 +232,7 @@ void decision_tree_hyperrectangle_is_stable(
     const Tier t
 ) {
     const unsigned int has_sample = status->has_sample;
+    (void) t;
 
     /* Ensures presence of a sample. */
     if (!has_sample) {

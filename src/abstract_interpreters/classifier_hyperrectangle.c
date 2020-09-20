@@ -61,6 +61,29 @@ static void region_to_hyperrectangle_l_inf_clip_all(
 
 
 /**
+ * Converts a clip \f$L_\infty\f$ #AdversarialRegion into a #Hyperrectangle.
+ * 
+ * @param[out] x Destination #Hyperrectangle
+ * @param[in] region Source #AdversarialRegion
+ */
+static void region_to_hyperrectangle_from_file(
+    Hyperrectangle x,
+    const AdversarialRegion region
+) {
+    unsigned int i;
+
+    for (i = 0; i < region.space_size; ++i) {
+        unsigned int n = fscanf(region.perturbation.data.from_file.stream, "[%lf;%lf] ", &x->intervals[i].l, &x->intervals[i].u);
+        if (n != 2) {
+            fprintf(stderr, "[%s: %d] Error while reading perturbation on dimension %d.", __FILE__, __LINE__, i);
+            abort();
+        }
+    }
+}
+
+
+
+/**
  * Converts an AdversarialRegion into a #Hyperrectangle.
  * 
  * @param[out] x Destination #Hyperrectangle
@@ -77,6 +100,10 @@ static void adversarial_region_to_hyperrectangle(
 
         case PERTURBATION_L_INF_CLIP_ALL:
             region_to_hyperrectangle_l_inf_clip_all(x, region);
+            break;
+
+        case PERTURBATION_FROM_FILE:
+            region_to_hyperrectangle_from_file(x, region);
             break;
     }
 }
