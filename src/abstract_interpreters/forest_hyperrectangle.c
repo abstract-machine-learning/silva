@@ -669,15 +669,24 @@ static void decorator_compute_labels(
  * Internal functions and data structures.
  **********************************************************************/
 
+/**
+ * Enforces constraint that a attributes belonging to the same
+ * categorical value must sum up to 1 and be either 0 or 1.
+ *
+ * @param[in] x Decorator to analyse
+ * @param[in] tier Tier information
+ * @param[in] i Index of attribute to check
+ * @param[in] is_active Tells whether feature i was set on or off
+ */
 static void adjust_tier(Hyperrectangle x, const Tier tier, const unsigned int i, const unsigned is_active) {
     const unsigned int group = tier.tiers[i];
 
-    // Feature is not part of a tier
+    /* Feature is not part of a tier */
     if (group == 0) {
         return;
     }
 
-    // If feature was activated, every feature in the same tier must be turned off
+    /* If feature was activated, every feature in the same tier must be turned off */
     if (is_active) {
         unsigned int j;
         x->intervals[i].l = 1.0;
@@ -690,8 +699,8 @@ static void adjust_tier(Hyperrectangle x, const Tier tier, const unsigned int i,
         }
     }
 
-    // If feature was turned of, and every other feature but one in the
-    // same tier is off, then the remaining feature must be turned on
+    /* If feature was turned of, and every other feature but one in the
+       same tier is off, then the remaining feature must be turned on */
     else {
         unsigned int j, n_members = 0, n_off = 0, candidate = 0;
         x->intervals[i].l = 0.0;
@@ -711,13 +720,15 @@ static void adjust_tier(Hyperrectangle x, const Tier tier, const unsigned int i,
     }
 }
 
+
+
 /**
  * Tells whether an analysis is complete.
  *
  * An analysis is complete when a counterexample was discovered, or a
  * timeout was reached.
  *
- * @param[in] x Decorator to analuse
+ * @param[in] x Decorator to analyse
  * @param[in] context Analysis data
  * @return 1 if analysis must stop, 0 otherwise
  */
