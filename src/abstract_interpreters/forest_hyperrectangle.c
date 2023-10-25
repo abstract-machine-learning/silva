@@ -740,18 +740,6 @@ static unsigned int is_complete(const Node x, Context context) {
         return 1;
     }
 
-
-/*
-    if (decorator_get_depth(x) > 25 && decorator_get_depth(x) < 45) {
-        hyperrectangle_sample(((struct analysis_data *) context)->status->sample_b, ((const HyperrectangleDecorator) x)->x);
-        forest_classify(((const HyperrectangleDecorator) x)->labels, ((struct analysis_data *) context)->F, ((struct analysis_data *) context)->status->sample_b);
-        if (!set_is_equal(((const HyperrectangleDecorator) x)->labels, ((struct analysis_data *) context)->status->labels_a)) {
-            ((struct analysis_data *) context)->internal_status = UNSTABLE;
-            return 1;
-        }
-    }
-*/
-
     /* Stops if a timeout was reached */
     if (time(NULL) - ((struct analysis_data *) context)->start_time > ((struct analysis_data *) context)->timeout) {
         ((struct analysis_data *) context)->internal_status = ABORTED;
@@ -796,6 +784,7 @@ static void refine(List refined, const Node n, Context context) {
         if (!set_is_equal(x->labels, data->status->labels_a)) {
             data->internal_status = UNSTABLE;
             hyperrectangle_midpoint(status->sample_b, x->x);
+            hyperrectangle_copy(status->region, x->x);
         }
 
         return;
@@ -830,6 +819,7 @@ static void refine(List refined, const Node n, Context context) {
             if (set_is_disjoint(h->labels, data->status->labels_a)) {
                 data->internal_status = UNSTABLE;
                 hyperrectangle_midpoint(status->sample_b, x_prime);
+                hyperrectangle_copy(status->region, x_prime);
                 break;
             }
 

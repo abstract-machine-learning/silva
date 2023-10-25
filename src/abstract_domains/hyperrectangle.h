@@ -386,4 +386,22 @@ static inline void hyperrectangle_print(const Hyperrectangle x, FILE *stream) {
     }
 }
 
+
+
+/**
+ * Prints a compact version of a hyperrectangle.
+ *
+ * @param[in] x Hyperrectangle
+ * @param[out] stream Stream
+ */
+static inline void hyperrectangle_dump(const Hyperrectangle x, FILE *stream) {
+    unsigned int i;
+
+    fprintf(stream, "[");
+    for (i = 0; i < x->n; ++i) {
+        interval_dump(x->intervals[i], stream);
+    }
+    fprintf(stream, "]\n");
+}
+
 #endif

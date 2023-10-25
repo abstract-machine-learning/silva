@@ -361,4 +361,21 @@ static inline void interval_print(const Interval x, FILE *stream) {
     }
 }
 
+
+
+/**
+ * Prints an interval in a compact form.
+ *
+ * @param[in] x Interval
+ * @param[out] stream Stream
+ */
+static inline void interval_dump(const Interval x, FILE *stream) {
+    if (x.l <= x.u) {
+        fprintf(stream, "[%g,%g]", x.l, x.u);
+    }
+    else {
+        fprintf(stream, "bottom");
+    }
+}
+
 #endif

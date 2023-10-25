@@ -77,7 +77,7 @@ static void print_string(const char *string, const Options options) {
 int main(const int argc, const char **argv) {
     unsigned int i;
     Options options;
-    FILE *classifier_file, *dataset_file;
+    FILE *classifier_file, *dataset_file, *counterexamples_file = NULL;
     Dataset dataset;
     Classifier classifier;
     AbstractClassifier abstract_classifier;
@@ -124,9 +124,16 @@ int main(const int argc, const char **argv) {
     set_create(&concrete_labels, set_equality_string);
     set_create(&abstract_labels, set_equality_string);
     status.sample_b = malloc(classifier_get_feature_space_size(classifier) * sizeof(double));
+    hyperrectangle_create(&status.region, classifier_get_feature_space_size(classifier));
     status.labels_a = concrete_labels;
     status.timeout = options.sample_timeout;
     stopwatch_create(&stopwatch);
+
+
+    /* Opens counterexamples file, if necessary */
+    if (options.counterexamples_path != NULL) {
+        counterexamples_file = fopen(options.counterexamples_path, "w");
+    }
 
 
     /* Prints heading */
@@ -192,6 +199,16 @@ int main(const int argc, const char **argv) {
               : "NO-INFO"
         );
         printf(" %10g\n", sample_time);
+
+
+        /* Exports counterexample, if necessary */
+        if (counterexamples_file != NULL && is_unstable) {
+            fprintf(counterexamples_file, "%d: ", i);
+            hyperrectangle_dump(status.region, counterexamples_file);
+        }
+
+
+        /* Resumes stopwatch */
         stopwatch_start(stopwatch);
     }
     stopwatch_stop(stopwatch);
@@ -219,6 +236,12 @@ int main(const int argc, const char **argv) {
     );
 
 
+    /* Closes counterexamples file, if necessary */
+    if (counterexamples_file != NULL) {
+        fclose(counterexamples_file);
+    }
+
+
     /* Deallocates memory */
     classifier_delete(&classifier);
     dataset_delete(&dataset);
@@ -226,6 +249,7 @@ int main(const int argc, const char **argv) {
     set_delete(&concrete_labels);
     set_delete(&abstract_labels);
     free(status.sample_b);
+    hyperrectangle_delete(&status.region);
     options_delete(&options);
     stopwatch_delete(&stopwatch);
 

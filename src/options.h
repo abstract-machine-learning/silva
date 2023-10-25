@@ -25,6 +25,7 @@ typedef struct options Options;
 struct options {
     char *classifier_path;             /**< Path to classifier file. */
     char *dataset_path;                /**< Path to dataset file. */
+    char *counterexamples_path;        /**< Path to counterexample file. */
     unsigned int max_print_length;     /**< Maximum number of characters to show
                                             for classifier and dataset paths. */
     ForestVotingScheme voting_scheme;  /**< Forest voting scheme. */

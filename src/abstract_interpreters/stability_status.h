@@ -8,6 +8,8 @@
 #define STABILITY_OPTIONS_H
 
 #include <stdio.h>
+#include "../abstract_domains/hyperrectangle.h"
+#include "../set.h"
 
 /** Types of stability analysis status. */
 enum stability_result {
@@ -30,6 +32,8 @@ struct stability_status {
     double *sample_b;         /**< Second sample, such that
                                    \f$result = STABILITY\_FALSE \Rightarrow
                                    Cl(sample_A) \neq Cl(sample_B)\f$. */
+    Hyperrectangle region;    /**< Hyperrectangle such that \f$\forall x
+                                   \in region\colon Cl(x) \neq Cl(sample_A)\f$*/
     Set labels_a;             /**< #Set of labels such that
                                    \f$ has\_sample \Rightarrow
                                    labels_A = Cl(sample_A)\f$. */

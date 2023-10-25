@@ -176,6 +176,7 @@ void options_read(Options *options, const int argc, const char *argv[]) {
 
     options->classifier_path = (char *) argv[1];
     options->dataset_path = (char *) argv[2];
+    options->counterexamples_path = NULL;
     options->max_print_length = MAX_PRINT_LENGTH;
     options->voting_scheme = VOTING_SCHEME;
     options->perturbation.type = PERTURBATION_L_INF;
@@ -186,7 +187,11 @@ void options_read(Options *options, const int argc, const char *argv[]) {
     options->seed = SEED;
 
     for (i = 3; i < argc; ++i) {
-        if (strcmp(argv[i], "--max-print-length") == 0 && i + 1 < argc) {
+        if (strcmp(argv[i], "--counterexamples") == 0 && i + 1 < argc) {
+            ++i;
+            options->counterexamples_path = (char *) argv[i];
+        }
+        else if (strcmp(argv[i], "--max-print-length") == 0 && i + 1 < argc) {
             ++i;
             sscanf(argv[i], "%u", &options->max_print_length);
             if (options->max_print_length < MIN_PRINT_LENGTH) {
@@ -238,6 +243,7 @@ void display_help(const int argc, const char *argv[]) {
 
     printf("Optional arguments:\n");
     printf("\t%-32s Maximum number of characters to print for long strings, -1 to disable limit (deafult: %u)\n", "--max-print-length VALUE", MAX_PRINT_LENGTH);
+    printf("\t%-32s Path to counterexamples file (default: null, no file will be generated)\n", "--counterexamples <path>");
     printf("\t%-32s Voting scheme to use for forests (default: max)\n", "--voting {max | average | softargmax}");
     printf("\t%-32s Abstract domain to use (default: hyperrectangle)\n", "--abstraction {interval | hyperrectangle}");
     printf("\t%-32s Perturbation to analyse, followed by perturbation-specific options (default: l_inf 0)\n", "--perturbation {l_inf, from-file} [DATA]");
@@ -264,6 +270,7 @@ void options_print(const Options options, FILE *stream) {
     fprintf(stream, "Program options:\n");
     fprintf(stream, "\tclassifier path: %s\n", options.classifier_path);
     fprintf(stream, "\tdataset path: %s\n", options.dataset_path);
+    fprintf(stream, "\tcounterexamples path: %s\n", options.dataset_path != NULL ? options.dataset_path : "none");
     fprintf(stream, "\tvoting scheme: %s\n", options.voting_scheme == FOREST_VOTING_MAX ? "max" : "average");
     fprintf(stream, "\tperturbation: ");
     perturbation_print(options.perturbation, stream);
