@@ -400,6 +400,9 @@ static inline void hyperrectangle_dump(const Hyperrectangle x, FILE *stream) {
     fprintf(stream, "[");
     for (i = 0; i < x->n; ++i) {
         interval_dump(x->intervals[i], stream);
+        if (i + 1 < x->n) {
+            fprintf(stream, ",");
+        }
     }
     fprintf(stream, "]\n");
 }
