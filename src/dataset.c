@@ -86,6 +86,7 @@ static void parse_header(
             break;
 
         case '\n':
+        case '\r':
             *format = DATASET_CSV;
             result = fscanf(stream, "# %u %u", n_rows, n_cols);
             if (result != 2) {
